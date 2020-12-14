@@ -8,3 +8,7 @@ ansible all -m apt -a name=nano --become --ask-become-pass
 ansible all -m apt -a name=snapd --become --ask-become-pass
 ansible all -m apt -a "name=snapd state=latest" --become --ask-become-pass
 ansible all -m apt -a "upgrade=dist" --become --ask-become
+
+ansible all -m gather_facts --limit 192.168.1.201 | grep ansible_distribution
+
+
