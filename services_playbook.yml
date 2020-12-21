@@ -3,18 +3,12 @@
   become: true
   pre_tasks:
 
-  - name: install updates (CentOS)
-    tags: always
-    dnf:
-      update_only: yes 
-      update_cache: yes
-    when: ansible_distribution == "CentOS"
-
   - name: install updates (Ubuntu)
     tags: always
     apt:
       upgrade: dist
       update_cache: yes
+      changed_when: false #changes will be not reported after running playbook 
     when: ansible_distribution == "Ubuntu"
 
 - hosts: all
