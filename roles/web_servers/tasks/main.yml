@@ -1,53 +1,27 @@
-- name: install apache 2 and php for Ubuntu servers
-  tags: apache,apache2,ubuntu
-  apt:
+- name: install apache and php packages 
+  tags: apache,httpd,php
+  package:
     name:
-      - apache2
-      - libapache2-mod-php
+      - "{{ apache_package_name }}"
+      - "{{ php_package_name }}"
     state: latest
-  when: ansible_distribution == "Ubuntu"
+
+- name: start and enable apache service 
+  tags: apache,httpd
+  service:
+    name: "{{ apache_service }}"
+    state: started
+    enabled: yes
 
 - name : change e-mail address of admin
   tags: apache2,ubuntu,email
   lineinfile:
     path: /etc/apache2/sites-available/000-default.conf
     regexp: '\tServerAdmin'
-    line: 'ServerAdmin somebody@somewhere.net'
+    line: 'ServerAdmin somebody@somewhere.com'
   when: ansible_distribution == "Ubuntu"
-  register: apache2_var
-
-- name: restart apache2 service (Ubuntu)
-  tags: apache2,ubuntu,email
-  service:
-    name: apache2
-    state: restarted
-  when: apache2_var.changed
-
-- name: start apache2 (Ubuntu)
-  tags: apache2,ubuntu,httpd
-  service:
-    name: apache2
-    state: started
-    enabled: yes
-  when: ansible_distribution == "Ubuntu"
-  register: apache2
-
-- name: install apache and php on CentOS servers 
-  tags: apache,centos,httpd
-  dnf:
-    name:
-      - httpd
-      - php
-    state: latest
-  when: ansible_distribution == "CentOS"
-
-- name: start httpd (CentOS)
-  tags: apache,centos,httpd
-  service: 
-    name: httpd
-    state: started
-    enabled: yes
-  when: ansible_distribution == "CentOS"
+  notify: restart_apache #this will notify handler task of name "restart_apache" to run
+                         #if this play register any change
 
 - name: copy default html file for site
   tags: apache,apache2,httpd
